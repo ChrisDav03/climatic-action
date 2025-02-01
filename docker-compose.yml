@@ -1,24 +1,13 @@
 services:
-  backend:
-    build: Backend/.
-    ports:
-      - "5000:5000"  
-
-  frontend:
-    build: frontend/.
-    ports:
-      - "3000:3000" 
-
   postgres:
     image: postgres
     restart: always
     ports:
       - "5431:5432"
     environment:
-      DATABASE_HOST: 127.0.0.1
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: establishment
+      POSTGRES_DB: mydb
     volumes:
       - ./db-backup/backup.sql:/docker-entrypoint-initdb.d/backup.sql
 
@@ -30,4 +19,20 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - postgres    
+      - postgres
+  backend:
+    build: Backend/.
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://root:root@localhost:5431/mydb
+      - JWT_SECRET = secret
+    depends_on:
+      - postgres
+
+  frontend:
+    build: frontend/.
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
