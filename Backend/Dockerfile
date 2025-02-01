@@ -3,6 +3,7 @@ FROM node:22-bullseye-slim
 WORKDIR /app 
 
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 
 RUN npm install 
 
