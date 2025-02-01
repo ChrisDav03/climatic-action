@@ -1,0 +1,48 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  hashedPassword String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt()
+
+  activities     AgronomicActivity[]
+  plots          Plot[]
+}
+
+model Plot {
+  id         String   @id @default(uuid())
+  latitude   Float
+  longitude  Float
+  size       Float
+  cropType   String
+
+  activities AgronomicActivity[]
+
+  userId   String
+  user     User @relation(fields: [userId], references: [id])
+}
+
+model AgronomicActivity {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  type        String
+  inputs      String   // Consider a separate table if multiple inputs per activity
+  duration    Int      // In minutes or hours, depending on requirements
+
+  userId      String
+  user        User @relation(fields: [userId], references: [id])
+
+  plotId      String
+  plot        Plot @relation(fields: [plotId], references: [id])
+}
