@@ -14,8 +14,12 @@ export class AuthController {
   signIn(@Body() dto: AuthDto, @Req() req, @Res() res) {
     return this.authService.signIn(dto, req, res);
   }
-  @Get('signout')
+  @Post('signout')
   signOut(@Req() req, @Res() res) {
     return this.authService.signOut(req, res);
+  }
+  @Get('me')
+  getUser(@Req() req) {
+    return this.authService.getUser(req);
   }
 }

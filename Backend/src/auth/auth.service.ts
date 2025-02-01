@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
@@ -58,6 +62,22 @@ export class AuthService {
       userId: foundUser.id,
       email: foundUser.email,
     });
+  }
+  async getUser(req: Request) {
+    const token = req.cookies['token'];
+    if (!token) throw new ForbiddenException('Not authenticated');
+
+    try {
+      const decoded = await this.jwt.verifyAsync(token, { secret: jwtSecret });
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.id },
+      });
+
+      if (!user) throw new ForbiddenException('User not found');
+      return { id: user.id, email: user.email };
+    } catch (error) {
+      throw new ForbiddenException('Invalid token', error);
+    }
   }
 
   signOut(req: Request, res: Response) {
