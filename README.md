@@ -54,6 +54,10 @@ La forma más sencilla de ejecutar el proyecto es con Docker Compose:
 ```
 docker-compose up --build
 ```
+Restaurar Base de datos:
+```
+docker exec -i climatic-action-postgres-1 pg_restore -U root -d mydb /backup.sql
+```
 Esto iniciará:
 
 Base de datos PostgreSQL en el puerto 5432
@@ -84,6 +88,8 @@ services:
 ```
 
 ### 🤝 Ejemplos Visuales
+- Usuario: christian@gmail.com
+- Contraseña: admin
 
 <img src="https://github.com/ChrisDav03/climatic-action/blob/master/imagenes/Screenshot%202025-02-02%20000750.png">
 <img src="https://github.com/ChrisDav03/climatic-action/blob/master/imagenes/Screenshot%202025-02-02%20000824.png">
