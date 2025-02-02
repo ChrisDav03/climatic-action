@@ -3,14 +3,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-// Definir el tipo del usuario
 interface User {
   id: string;
   email: string;
   name?: string;
 }
 
-// Definir el tipo del contexto de autenticación
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -18,16 +16,14 @@ interface AuthContextType {
   loading: boolean;
 }
 
-// Crear el contexto con tipo explícito
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Proveedor del contexto
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Función para iniciar sesión
+  
   const login = async (email: string, password: string) => {
     try {
       const res = await axios.post(
@@ -56,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   
 
-  // Función para cerrar sesión
+  
   const logout = async () => {
     try {
       await axios.post("http://localhost:5000/auth/signout", {}, { withCredentials: true });
@@ -71,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Validar usuario al cargar la app
+
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -104,7 +100,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Hook para acceder al contexto
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
