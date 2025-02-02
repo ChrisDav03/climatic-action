@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { getPlots, deletePlot, createPlot, updatePlot } from "./plots/plots.api";
 import PlotTable from "./plots/plotTable";
 import PlotDetailsDialog from "./plots/plotDetailsDialog";
-import PlotEditDialog from "./plots/plotEdit"; // Reutilizado para creación y edición
+import PlotEditDialog from "./plots/plotEdit"; 
 import { getActivitiesByPlot } from "./activities/activities.api";
 
 export default function Home() {
@@ -14,10 +14,10 @@ export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [plots, setPlots] = useState<any[]>([]);
-  const [selectedPlot, setSelectedPlot] = useState<any>(null); // `null` para creación
+  const [selectedPlot, setSelectedPlot] = useState<any>(null); 
   const [activities, setActivities] = useState<any[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false); // Para detalles
-  const [editDialogOpen, setEditDialogOpen] = useState(false); // Para edición/creación
+  const [dialogOpen, setDialogOpen] = useState(false); 
+  const [editDialogOpen, setEditDialogOpen] = useState(false); 
 
   useEffect(() => {
     if (!user) {
