@@ -54,12 +54,12 @@ export default function Home() {
   };
 
   const handleEditPlot = (plot: any) => {
-    setSelectedPlot(plot); // Establece el plot para edición
+    setSelectedPlot(plot); 
     setEditDialogOpen(true);
   };
 
   const handleCreatePlot = () => {
-    setSelectedPlot(null); // `null` indica modo de creación
+    setSelectedPlot(null); 
     setEditDialogOpen(true);
   };
 
