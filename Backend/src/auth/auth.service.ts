@@ -10,7 +10,6 @@ import { PrismaService } from 'prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { jwtSecret } from '../utils/constants';
 import { Request, Response } from 'express';
 
 @Injectable()
@@ -19,6 +18,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
   ) {}
+
   async signUp(dto: AuthDto) {
     const { email, password } = dto;
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
@@ -32,23 +32,22 @@ export class AuthService {
         hashedPassword,
       },
     });
-    return { message: 'signUp was successfull' };
+    return { message: 'Sign-up was successful' };
   }
 
   async signIn(dto: AuthDto, req: Request, res: Response) {
     const { email, password } = dto;
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (!foundUser) {
-      throw new BadRequestException('Wrong Credentials');
+      throw new BadRequestException('Wrong credentials');
     }
     const isMatch = await this.comparePassword({
       password,
       hash: foundUser.hashedPassword,
     });
     if (!isMatch) {
-      throw new BadRequestException('Wrong Credentials');
+      throw new BadRequestException('Wrong credentials');
     }
-    //sign jwt and return the user
     const token = await this.signToken({
       id: foundUser.id,
       email: foundUser.email,
@@ -56,19 +55,26 @@ export class AuthService {
     if (!token) {
       throw new BadRequestException('Something went wrong');
     }
-    res.cookie('token', token, { httpOnly: true });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    });
     return res.send({
       message: 'Sign-in was successful',
       userId: foundUser.id,
       email: foundUser.email,
     });
   }
+
   async getUser(req: Request) {
     const token = req.cookies['token'];
     if (!token) throw new ForbiddenException('Not authenticated');
 
     try {
-      const decoded = await this.jwt.verifyAsync(token, { secret: jwtSecret });
+      const decoded = await this.jwt.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
       const user = await this.prisma.user.findUnique({
         where: { id: decoded.id },
       });
@@ -76,25 +82,29 @@ export class AuthService {
       if (!user) throw new ForbiddenException('User not found');
       return { id: user.id, email: user.email };
     } catch (error) {
-      throw new ForbiddenException('Invalid token', error);
+      if (error.name === 'TokenExpiredError') {
+        throw new ForbiddenException('Token has expired');
+      }
+      throw new ForbiddenException('Invalid token');
     }
   }
 
   signOut(req: Request, res: Response) {
-    res.clearCookie('token');
-    return res.send({ message: 'signOut was successfull' });
+    res.clearCookie('token', { httpOnly: true, secure: true });
+    return res.send({ message: 'Sign-out was successful' });
   }
 
   async hashPassword(password: string) {
-    const salt0rRounds = 10;
-    return bcrypt.hash(password, salt0rRounds);
+    const saltOrRounds = 10;
+    return bcrypt.hash(password, saltOrRounds);
   }
 
   async comparePassword(args: { password: string; hash: string }) {
-    return await bcrypt.compare(args.password, args.hash);
+    return bcrypt.compare(args.password, args.hash);
   }
+
   async signToken(args: { id: string; email: string }) {
     const payload = args;
-    return await this.jwt.signAsync(payload, { secret: jwtSecret });
+    return this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET });
   }
 }

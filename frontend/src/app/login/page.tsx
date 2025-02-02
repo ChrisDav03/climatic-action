@@ -1,7 +1,7 @@
-"use client"; 
+"use client";
 
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext"; 
+import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -13,36 +13,37 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null); 
-    setLoading(true);
+    setLoading(true); 
 
     try {
       await login(email, password);
-    } catch (err) {
-      setError("Credenciales incorrectas. Intenta nuevamente.");
-      console.error("Error en login:", err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); 
+      } else {
+        setError("Ocurrió un error desconocido. Intenta nuevamente.");
+      }
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form 
-        onSubmit={handleSubmit} 
+      <form
+        onSubmit={handleSubmit}
         className="p-6 bg-white shadow-lg rounded-md w-80"
       >
         <h2 className="text-xl font-bold mb-4 text-center">Iniciar sesión</h2>
-
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Correo electrónico"
           className="block w-full p-2 my-2 border rounded"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          aria-label="Correo electrónico"
         />
 
         <input
@@ -52,11 +53,10 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          aria-label="Contraseña"
         />
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="w-full p-2 mt-2 bg-blue-500 text-white rounded disabled:opacity-50"
           disabled={loading}
         >

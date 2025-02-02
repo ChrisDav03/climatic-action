@@ -81,6 +81,12 @@ export class AgronomicActivityService {
     });
     return { activity };
   }
+  async getAgronomicActivityByPlot(id: string) {
+    const activity = await this.prisma.agronomicActivity.findMany({
+      where: { plotId: id },
+    });
+    return { activity };
+  }
   async getAgronomicActivities() {
     return await this.prisma.agronomicActivity.findMany();
   }

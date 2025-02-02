@@ -44,6 +44,11 @@ export class AgronomicActivityController {
     return this.agronomicActivityService.getAgronomicActivity(params.id);
   }
   @UseGuards(JwtAuthGuard)
+  @Get('/plot/:id')
+  getAgronomicActivityByPlot(@Param() params: { id: string }) {
+    return this.agronomicActivityService.getAgronomicActivityByPlot(params.id);
+  }
+  @UseGuards(JwtAuthGuard)
   @Get()
   getAgronomicActivities() {
     return this.agronomicActivityService.getAgronomicActivities();

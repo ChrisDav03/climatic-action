@@ -55,6 +55,12 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%
   }
+  .map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem; 
+  }
 }
 @layer base {
   * {

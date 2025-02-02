@@ -32,20 +32,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         { withCredentials: true }
       );
   
-      console.log("Usuario recibido en login:", res.data); // 🔥 Debugging
+      console.log("Usuario recibido en login:", res.data); // Debugging
   
       if (res.data) {
-        setUser({ id: res.data.userId, email: res.data.email }); // 🔥 Guarda correctamente el usuario
-        localStorage.setItem("user", JSON.stringify({ id: res.data.userId, email: res.data.email }));
+        setUser({ id: res.data.userId, email: res.data.email });
+  
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: res.data.userId, email: res.data.email })
+        );
+  
         router.push("/dashboard");
       } else {
         throw new Error("No se recibió usuario en la respuesta");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Error en login:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.message || "Error en el servidor";
+        console.error("Error en login:", errorMessage);
+        throw new Error(errorMessage); 
       } else {
         console.error("Error en login:", error);
+        throw new Error("Error desconocido");
       }
     }
   };
